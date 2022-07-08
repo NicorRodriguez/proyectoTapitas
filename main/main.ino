@@ -8,6 +8,7 @@ Servo myservo;
 
 bool onlyOnce = true;
 int buttonState;
+int posmyservo = 0;
 int pos = 0;
 int angle = 0;
 
@@ -20,8 +21,8 @@ void setup() {
   myservo.attach(13);
   myStepper.setSpeed(15);
   compuerta.attach(12);
-  myservo.write(0);
-  compuerta.write(90);
+  //myservo.write(180);
+  //compuerta.write(90);
 }
 
 void moveServo(Servo &motor, int value, int delayServo){
@@ -37,23 +38,39 @@ void moveServo(Servo &motor, int value, int delayServo){
 }
 
 int angleByColor(char* color){
-  if(color == "ROJO") return 20;
-  if(color == "AZUL") return 55;
-  if(color == "VERDE") return 90;
-  if(color == "NEGRO") return 125;
-  else return 160;
+  //return 120;
+  if(color == "ROJO") return 170;
+  if(color == "AZUL") return 120;
+  if(color == "VERDE") return 80;
+  if(color == "NEGRO") return 40;
+  else return 0;
 }
 
 void loop() {
+  
   RGB_t c = COLOR_getRGB();
-  moveServo(myservo, 90, 0);
+  //moveServo(myservo, 90, 0);
   Serial.println(COLOR_getColorName());
+  myservo.write(170);
 
   
-  angle = angleByColor("NEGRO");
-  compuerta.write(angle);
-  myStepper.step(stepsPerRevolution);
-  delay(10);
+  angle = angleByColor(COLOR_getColorName());
+  Serial.println(angle);
+  for (posmyservo = 180; posmyservo >= angle; posmyservo -= 1) {
+    myservo.write(posmyservo);
+    delay(10);
+  }
+  delay(500);
+  compuerta.write(180);
+  delay(500);
+  compuerta.write(0);
+  delay(500);
   
-  //moveServo(compuerta, angle, 2000);
+  moveServo(compuerta, angle, 2000);
+
+  for (posmyservo = angle; posmyservo <= 180; posmyservo += 1) {
+    myservo.write(posmyservo);
+    delay(10);
+  }
+  delay(500);
 }
